@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  # 1. Relational Database (Users, Workspaces, Metadata)
+  postgres:
+    image: postgres:15-alpine
+    container_name: python-rag-postgres
+    env_file:
+      - ./backend/.env
+    ports:
+      - "5435:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U python_rag_user -d rag_memory"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # 2. Redis (Short-Term Memory & Celery Broker)
+  redis:
+    image: redis:7-alpine
+    container_name: python-rag-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # 3. Vector Database (Long-Term/Workspace Memory & RAG)
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: python-rag-qdrant
+    ports:
+      - "6333:6333" # REST API
+      - "6334:6334"           # gRPC
+    volumes:
+      - qdrant_data:/qdrant/storage
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
+  qdrant_data:
