@@ -31,12 +31,12 @@ class QdrantVectorStore:
             )
         print(f"[INFO] Loaded Qdrant collection '{collection_name}' with embedding model: {embedding_model}")
 
-    def add_documents(self, documents: List[Any], source_filename: str):
+    def add_documents(self, documents: List[Any], source_filename: str, user_id: str):
         if not documents:
             print(f"[WARNING] No documents to add for {source_filename}.")
             return
             
-        print(f"[INFO] Adding {len(documents)} document pages/chunks for {source_filename} to vector store...")
+        print(f"[INFO] Adding {len(documents)} document pages/chunks for {source_filename} to vector store for user {user_id}...")
         
         emb_pipe = EmbeddingPipeline(model_name=self.embedding_model, chunk_size=self.chunk_size, chunk_overlap=self.chunk_overlap)
         chunks = emb_pipe.chunk_documents(documents)
@@ -45,7 +45,7 @@ class QdrantVectorStore:
             return
             
         embeddings = emb_pipe.embed_chunks(chunks)
-        metadatas = [{"text": chunk.page_content, "source": source_filename} for chunk in chunks]
+        metadatas = [{"text": chunk.page_content, "source": source_filename, "user_id": user_id} for chunk in chunks]
         
         points = []
         for i, (emb, meta) in enumerate(zip(embeddings, metadatas)):
@@ -61,18 +61,23 @@ class QdrantVectorStore:
         )
         print(f"[INFO] Upserted {len(points)} vectors to Qdrant collection '{self.collection_name}' for {source_filename}.")
 
-    def search(self, query_embedding: np.ndarray, top_k: int = 5, filter_source: str = None):
+    def search(self, query_embedding: np.ndarray, user_id: str, top_k: int = 5, filter_source: str = None):
         try:
-            query_filter = None
-            if filter_source:
-                query_filter = qmodels.Filter(
-                    must=[
-                        qmodels.FieldCondition(
-                            key="source",
-                            match=qmodels.MatchValue(value=filter_source)
-                        )
-                    ]
+            must_conditions = [
+                qmodels.FieldCondition(
+                    key="user_id",
+                    match=qmodels.MatchValue(value=user_id)
                 )
+            ]
+            if filter_source:
+                must_conditions.append(
+                    qmodels.FieldCondition(
+                        key="source",
+                        match=qmodels.MatchValue(value=filter_source)
+                    )
+                )
+            
+            query_filter = qmodels.Filter(must=must_conditions)
             
             results = self.client.query_points(
                 collection_name=self.collection_name,
@@ -85,11 +90,11 @@ class QdrantVectorStore:
             print(f"[ERROR] Qdrant search failed: {e}")
             return []
 
-    def query(self, query_text: str, top_k: int = 5, filter_source: str = None):
+    def query(self, query_text: str, user_id: str, top_k: int = 5, filter_source: str = None):
         print(f"[INFO] Querying vector store for: '{query_text}'" + (f" (filtered by {filter_source})" if filter_source else ""))
         query_emb = self.model.encode([query_text])[0]
         
-        vector_results = self.search(query_emb, top_k=top_k, filter_source=filter_source)
+        vector_results = self.search(query_emb, user_id=user_id, top_k=top_k, filter_source=filter_source)
         
         combined_results = []
         for res in vector_results:
@@ -101,8 +106,8 @@ class QdrantVectorStore:
             
         return combined_results
 
-    def delete_by_source(self, source_filename: str):
-        print(f"[INFO] Deleting vectors for source: {source_filename}")
+    def delete_by_source(self, source_filename: str, user_id: str):
+        print(f"[INFO] Deleting vectors for source: {source_filename} by user {user_id}")
         try:
             self.client.delete(
                 collection_name=self.collection_name,
@@ -112,6 +117,10 @@ class QdrantVectorStore:
                             qmodels.FieldCondition(
                                 key="source",
                                 match=qmodels.MatchValue(value=source_filename)
+                            ),
+                            qmodels.FieldCondition(
+                                key="user_id",
+                                match=qmodels.MatchValue(value=user_id)
                             )
                         ]
                     )

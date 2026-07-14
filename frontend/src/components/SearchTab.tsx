@@ -17,7 +17,10 @@ export default function SearchTab() {
     const fetchDocuments = async () => {
       setIsLoadingDocs(true);
       try {
-        const res = await fetch(`${API_BASE}/api/documents`);
+        const token = localStorage.getItem("token");
+        const res = await fetch(`${API_BASE}/api/documents`, {
+          headers: { "Authorization": `Bearer ${token}` }
+        });
         if (res.ok) {
           const data = await res.json();
           setDocuments(data.documents);
@@ -38,9 +41,13 @@ export default function SearchTab() {
     setLoading(true);
     setHasSearched(true);
     try {
+      const token = localStorage.getItem("token");
       const res = await fetch(`${API_BASE}/api/search`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
         body: JSON.stringify({ 
             query, 
             filename_filter: filenameFilter.trim() ? filenameFilter : null,

@@ -23,9 +23,13 @@ export default function ChatTab() {
     setLoadingChat(true);
 
     try {
+      const token = localStorage.getItem("token");
       const response = await fetch(`${API_BASE}/api/chat`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}` 
+        },
         body: JSON.stringify({ query: userMessage.content, session_id: "user-session-1" }),
       });
 

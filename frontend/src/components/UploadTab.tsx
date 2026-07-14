@@ -23,8 +23,12 @@ export default function UploadTab() {
     formData.append("document_type", docType);
 
     try {
+      const token = localStorage.getItem("token");
       const response = await fetch(`${API_BASE}/api/upload`, {
         method: "POST",
+        headers: {
+          "Authorization": `Bearer ${token}`
+        },
         body: formData,
       });
       if (!response.ok) throw new Error("Upload failed");

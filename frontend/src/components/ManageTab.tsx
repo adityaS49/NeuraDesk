@@ -10,7 +10,10 @@ export default function ManageTab() {
   const fetchDocuments = async () => {
     setIsLoadingDocs(true);
     try {
-      const res = await fetch(`${API_BASE}/api/documents`);
+      const token = localStorage.getItem("token");
+      const res = await fetch(`${API_BASE}/api/documents`, {
+        headers: { "Authorization": `Bearer ${token}` }
+      });
       if (res.ok) {
         const data = await res.json();
         setDocuments(data.documents);
@@ -28,8 +31,10 @@ export default function ManageTab() {
 
   const handleDelete = async (filename: string) => {
     try {
+      const token = localStorage.getItem("token");
       const res = await fetch(`${API_BASE}/api/documents/${filename}`, {
         method: "DELETE",
+        headers: { "Authorization": `Bearer ${token}` }
       });
       if (res.ok) {
         fetchDocuments();

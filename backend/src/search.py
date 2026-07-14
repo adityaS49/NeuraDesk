@@ -17,6 +17,7 @@ load_dotenv()
 class State(TypedDict):
     messages: Annotated[list, add_messages]
     context: str
+    username: str
 
 class RAGSearch:
     def __init__(self, collection_name: str = "documents", embedding_model: str = "all-MiniLM-L6-v2", llm_model: str = "llama-3.3-70b-versatile"):
@@ -50,7 +51,8 @@ class RAGSearch:
         
         def call_model(state: State):
             context = state.get("context", "")
-            system_prompt = f"You are a helpful assistant. Use the following context to answer the user's question:\n\n{context}\n\nIf the answer isn't in the context, just say you don't know."
+            username = state.get("username", "User")
+            system_prompt = f"You are a helpful AI assistant. You are speaking with {username}. Use the following context to answer their question:\n\n{context}\n\nIf the answer isn't in the context, just say you don't know."
             
             # Combine system prompt with existing messages
             messages_for_llm = [{"role": "system", "content": system_prompt}] + state["messages"]
@@ -64,9 +66,9 @@ class RAGSearch:
         self.graph = workflow.compile(checkpointer=self.checkpointer)
         print(f"[INFO] Groq LLM initialized with LangGraph Postgres Checkpointer: {llm_model}")
 
-    def search_and_summarize(self, query: str, session_id: str = "default", top_k: int = 5, filename_filter: str = None) -> str:
+    def search_and_summarize(self, query: str, user_id: str, username: str, session_id: str = "default", top_k: int = 5, filename_filter: str = None) -> str:
         try:
-            results = self.vectorstore.query(query, top_k=top_k, filter_source=filename_filter)
+            results = self.vectorstore.query(query, user_id=user_id, top_k=top_k, filter_source=filename_filter)
             texts = [r["metadata"].get("text", "") for r in results if r["metadata"]]
             context = "\n\n".join(texts)
         except Exception as e:
@@ -77,11 +79,11 @@ class RAGSearch:
             context = "No relevant documents found."
             
         try:
-            config = {"configurable": {"thread_id": session_id}}
+            config = {"configurable": {"thread_id": f"{user_id}_{session_id}"}}
             input_message = HumanMessage(content=query)
             
             # Run the LangGraph
-            state = self.graph.invoke({"messages": [input_message], "context": context}, config)
+            state = self.graph.invoke({"messages": [input_message], "context": context, "username": username}, config)
             
             # The last message in the state is the AI's response
             return state["messages"][-1].content
