@@ -10,8 +10,9 @@ Built with a **Next.js** frontend and a **FastAPI** backend, the system utilizes
 
 - **Dynamic Premium UI**: A highly engaging, glassmorphic Next.js interface with micro-animations.
 - **Diskless Ingestion**: Uploaded documents are parsed entirely in memory/temp-space and never saved to disk.
-- **Multi-Format Support**: Ingests PDF, Text, CSV, Excel, Word, and JSON files seamlessly.
+- **Multi-Format Support**: Ingests PDF (via PyMuPDF for robust extraction), Text, CSV, Excel (with safe file lock handling), Word, and JSON files seamlessly.
 - **Agentic RAG Engine**: Utilizes LangGraph to power an advanced conversational and search pipeline, ensuring accurate answers with context citations.
+- **Secure Multi-Tenancy**: Persistent Postgres storage and session-based authentication prevents data cross-contamination between different users.
 - **Hybrid Search & Management**: You can query the entire knowledge base, or filter by specific uploaded documents.
 - **Local Embeddings & High-Speed LLMs**: Generates semantic embeddings locally using `sentence-transformers` and queries via the lightning-fast Groq API (`llama-3.3-70b-versatile`).
 

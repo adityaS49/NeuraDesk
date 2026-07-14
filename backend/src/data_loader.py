@@ -1,6 +1,6 @@
 from pathlib import Path
 from typing import List, Any
-from langchain_community.document_loaders import PyPDFLoader, TextLoader, CSVLoader
+from langchain_community.document_loaders import PyMuPDFLoader, TextLoader, CSVLoader
 from langchain_community.document_loaders import Docx2txtLoader
 import pandas as pd
 from langchain_core.documents import Document
@@ -18,7 +18,7 @@ def load_single_document(temp_file_path: str, original_filename: str) -> List[Do
     
     try:
         if ext == '.pdf':
-            loader = PyPDFLoader(temp_file_path)
+            loader = PyMuPDFLoader(temp_file_path)
             documents = loader.load()
         elif ext == '.txt':
             loader = TextLoader(temp_file_path)
@@ -27,17 +27,17 @@ def load_single_document(temp_file_path: str, original_filename: str) -> List[Do
             loader = CSVLoader(temp_file_path)
             documents = loader.load()
         elif ext in ['.xls', '.xlsx']:
-            excel_file = pd.ExcelFile(temp_file_path)
-            for sheet_name in excel_file.sheet_names:
-                df = excel_file.parse(sheet_name)
-                for index, row in df.iterrows():
-                    row_dict = row.to_dict()
-                    row_str = ", ".join([f"{k}: {v}" for k, v in row_dict.items() if pd.notna(v)])
-                    if row_str.strip():
-                        documents.append(Document(
-                            page_content=row_str,
-                            metadata={"sheet_name": sheet_name, "row": index}
-                        ))
+            with pd.ExcelFile(temp_file_path) as excel_file:
+                for sheet_name in excel_file.sheet_names:
+                    df = excel_file.parse(sheet_name)
+                    for index, row in df.iterrows():
+                        row_dict = row.to_dict()
+                        row_str = ", ".join([f"{k}: {v}" for k, v in row_dict.items() if pd.notna(v)])
+                        if row_str.strip():
+                            documents.append(Document(
+                                page_content=row_str,
+                                metadata={"sheet_name": sheet_name, "row": index}
+                            ))
         elif ext == '.docx':
             loader = Docx2txtLoader(temp_file_path)
             documents = loader.load()
@@ -79,7 +79,7 @@ def load_all_documents(data_dir: str) -> List[Any]:
     for pdf_file in pdf_files:
         print(f"[DEBUG] Loading PDF: {pdf_file}")
         try:
-            loader = PyPDFLoader(str(pdf_file))
+            loader = PyMuPDFLoader(str(pdf_file))
             loaded = loader.load()
             print(f"[DEBUG] Loaded {len(loaded)} PDF docs from {pdf_file}")
             documents.extend(loaded)
@@ -118,22 +118,22 @@ def load_all_documents(data_dir: str) -> List[Any]:
     for xlsx_file in xlsx_files:
         print(f"[DEBUG] Loading Excel: {xlsx_file}")
         try:
-            excel_file = pd.ExcelFile(str(xlsx_file))
-            loaded = []
-            for sheet_name in excel_file.sheet_names:
-                df = excel_file.parse(sheet_name)
-                for index, row in df.iterrows():
-                    row_dict = row.to_dict()
-                    # format key-values into a single readable string
-                    row_str = ", ".join([f"{k}: {v}" for k, v in row_dict.items() if pd.notna(v)])
-                    if row_str.strip():
-                        doc = Document(
-                            page_content=row_str,
-                            metadata={"source": str(xlsx_file), "sheet_name": sheet_name, "row": index}
-                        )
-                        loaded.append(doc)
-            print(f"[DEBUG] Loaded {len(loaded)} Excel rows from {xlsx_file}")
-            documents.extend(loaded)
+            with pd.ExcelFile(str(xlsx_file)) as excel_file:
+                loaded = []
+                for sheet_name in excel_file.sheet_names:
+                    df = excel_file.parse(sheet_name)
+                    for index, row in df.iterrows():
+                        row_dict = row.to_dict()
+                        # format key-values into a single readable string
+                        row_str = ", ".join([f"{k}: {v}" for k, v in row_dict.items() if pd.notna(v)])
+                        if row_str.strip():
+                            doc = Document(
+                                page_content=row_str,
+                                metadata={"source": str(xlsx_file), "sheet_name": sheet_name, "row": index}
+                            )
+                            loaded.append(doc)
+                print(f"[DEBUG] Loaded {len(loaded)} Excel rows from {xlsx_file}")
+                documents.extend(loaded)
         except Exception as e:
             print(f"[ERROR] Failed to load Excel {xlsx_file}: {e}")
 

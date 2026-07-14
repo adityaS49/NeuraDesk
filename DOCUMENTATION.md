@@ -39,7 +39,7 @@ The backend `api.py` acts as the main controller. It uses standard Pydantic mode
 
 ### 2.3 Data Ingestion Pipeline (`src/data_loader.py` & `src/embedding.py`)
 When a file is uploaded:
-1. **Extraction**: The file extension dictates the `langchain_community` loader (e.g., `PyPDFLoader`, `Docx2txtLoader`, `CSVLoader`).
+1. **Extraction**: The file extension dictates the `langchain_community` loader (e.g., `PyMuPDFLoader`, `Docx2txtLoader`, `CSVLoader`). `PyMuPDFLoader` is explicitly used for PDF files to ensure robust text extraction compared to basic parsers. Excel files (`.xlsx`, `.xls`) are read using `pandas.ExcelFile` wrapped in a `with` context manager to prevent file-locking issues (`WinError 32`) on Windows.
 2. **Chunking**: The extracted documents are fed into a `RecursiveCharacterTextSplitter`.
 3. **Metadata Enrichment**: Each chunk is annotated with `source`, `page`, and custom metadata tracking its origin file.
 
@@ -71,7 +71,7 @@ Uses **LangGraph** to build a reliable conversational agent state machine.
 2. HTTP POST multipart/form-data to FastAPI `/api/upload`.
 3. `api.py` streams file into a temporary tempfile.
 4. `db.py` creates a record in Postgres.
-5. `data_loader.py` uses `PyPDFLoader` to parse the tempfile into LangChain `Document` objects.
+5. `data_loader.py` uses `PyMuPDFLoader` to parse the tempfile into LangChain `Document` objects.
 6. `vectorstore.py` chunks the documents, embeds them via SentenceTransformers, and upserts them to Qdrant.
 7. Tempfile is explicitly unlinked (deleted) from disk.
 8. HTTP 200 OK returned to UI.
