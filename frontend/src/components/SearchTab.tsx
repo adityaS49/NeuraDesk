@@ -70,8 +70,8 @@ export default function SearchTab() {
   return (
     <div className="w-full max-w-4xl glass-panel rounded-3xl p-8 mt-12 animate-fade-in-up">
       <div className="text-center mb-8">
-        <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 to-purple-600">Deep Search</h2>
-        <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-2">Query across all documents or filter by a specific source.</p>
+        <h2 className="text-2xl font-bold text-blue-400">Deep Search</h2>
+        <p className="text-sm text-zinc-400 mt-2">Query across all documents or filter by a specific source.</p>
       </div>
       
       <form onSubmit={handleSearch} className="flex flex-col gap-4 mb-10">
@@ -81,14 +81,14 @@ export default function SearchTab() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="What are you looking for?"
-            className="flex-1 bg-white/50 dark:bg-zinc-900/50 backdrop-blur-sm border border-zinc-200 dark:border-zinc-700 rounded-2xl px-5 py-4 text-zinc-900 dark:text-zinc-100 outline-none focus:ring-2 focus:ring-indigo-500 shadow-inner"
+            className="flex-1 bg-zinc-800 border border-zinc-700 rounded-2xl px-5 py-4 text-zinc-100 outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm"
           />
           <div className="w-full md:w-1/3 relative">
             <select
               value={filenameFilter}
               onChange={(e) => setFilenameFilter(e.target.value)}
               disabled={isLoadingDocs}
-              className="w-full h-full bg-white/50 dark:bg-zinc-900/50 backdrop-blur-sm border border-zinc-200 dark:border-zinc-700 rounded-2xl px-5 py-4 text-zinc-900 dark:text-zinc-100 outline-none focus:ring-2 focus:ring-indigo-500 appearance-none cursor-pointer disabled:opacity-50 shadow-inner"
+              className="w-full h-full bg-zinc-800 border border-zinc-700 rounded-2xl px-5 py-4 text-zinc-100 outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none cursor-pointer disabled:opacity-50 shadow-sm"
             >
               <option value="">{isLoadingDocs ? "Loading docs..." : "All Contexts"}</option>
               {documents.map((doc) => (
@@ -104,7 +104,7 @@ export default function SearchTab() {
           <button 
             type="submit" 
             disabled={loading || !query.trim()}
-            className="px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:scale-105 text-white font-bold rounded-2xl transition-all shadow-lg shadow-indigo-500/30 disabled:opacity-50 disabled:hover:scale-100"
+            className="px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl transition-all shadow-sm disabled:opacity-50"
           >
             {loading ? "Searching..." : "Search"}
           </button>
@@ -114,32 +114,31 @@ export default function SearchTab() {
       <div className="space-y-6 relative z-10">
         {loading && hasSearched && (
           <div className="flex justify-center py-12 animate-fade-in-up">
-            <div className="flex gap-2 items-center bg-white/50 dark:bg-zinc-800/50 px-6 py-3 rounded-full border border-zinc-200 dark:border-zinc-700 backdrop-blur-md">
-              <div className="w-2.5 h-2.5 bg-indigo-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-              <div className="w-2.5 h-2.5 bg-purple-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-              <div className="w-2.5 h-2.5 bg-pink-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
-              <span className="ml-2 text-zinc-600 dark:text-zinc-300 font-medium text-sm">AI is thinking...</span>
+            <div className="flex gap-2 items-center bg-zinc-800 px-6 py-3 rounded-full border border-zinc-700 shadow-sm">
+              <div className="w-2.5 h-2.5 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+              <div className="w-2.5 h-2.5 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+              <div className="w-2.5 h-2.5 bg-blue-300 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+              <span className="ml-2 text-zinc-300 font-medium text-sm">AI is thinking...</span>
             </div>
           </div>
         )}
 
         {results.length === 0 && !loading && hasSearched && (
-          <div className="text-center py-12 bg-zinc-50/50 dark:bg-zinc-800/20 rounded-2xl border border-dashed border-zinc-200 dark:border-zinc-700 animate-fade-in-up">
+          <div className="text-center py-12 bg-zinc-800/20 rounded-2xl border border-dashed border-zinc-700 animate-fade-in-up">
             <svg className="w-10 h-10 text-zinc-400 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
             <p className="text-zinc-500 font-medium">No relevant information found.</p>
           </div>
         )}
         
         {answer && !loading && (
-          <div className="bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 rounded-2xl p-6 border border-indigo-100 dark:border-indigo-800/30 shadow-lg shadow-indigo-500/5 animate-fade-in-up relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-purple-400/10 rounded-full blur-2xl transform translate-x-1/2 -translate-y-1/2"></div>
+          <div className="bg-blue-900/10 rounded-2xl p-6 border border-blue-900/30 shadow-sm animate-fade-in-up relative overflow-hidden">
             <div className="flex items-center gap-3 mb-4 relative z-10">
-              <div className="p-2 bg-indigo-100 dark:bg-indigo-900/50 rounded-lg">
-                <svg className="w-5 h-5 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+              <div className="p-2 bg-blue-900/50 rounded-lg">
+                <svg className="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
               </div>
-              <h3 className="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400">AI Synthesized Answer</h3>
+              <h3 className="text-lg font-bold text-blue-400">AI Synthesized Answer</h3>
             </div>
-            <p className="text-zinc-800 dark:text-zinc-200 leading-relaxed whitespace-pre-wrap text-[15px] relative z-10 font-medium">
+            <p className="text-zinc-200 leading-relaxed whitespace-pre-wrap text-[15px] relative z-10 font-medium">
               {answer}
             </p>
           </div>
@@ -148,18 +147,18 @@ export default function SearchTab() {
         {!loading && results.length > 0 && (
           <div className="pt-6 animate-fade-in-up" style={{ animationDelay: '100ms' }}>
             <div className="flex items-center gap-4 mb-6">
-              <div className="h-px flex-1 bg-zinc-200 dark:bg-zinc-800"></div>
+              <div className="h-px flex-1 bg-zinc-700"></div>
               <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-widest">Referenced Sources</h3>
-              <div className="h-px flex-1 bg-zinc-200 dark:bg-zinc-800"></div>
+              <div className="h-px flex-1 bg-zinc-700"></div>
             </div>
           </div>
         )}
         
         {results.map((res, i) => (
-          <div key={i} className="group bg-white/60 dark:bg-zinc-900/60 backdrop-blur-md rounded-2xl p-6 border border-zinc-200/50 dark:border-zinc-700/50 hover:border-indigo-300 dark:hover:border-indigo-700/50 hover:shadow-lg hover:shadow-indigo-500/5 transition-all duration-300 animate-fade-in-up" style={{ animationDelay: `${(i + 2) * 50}ms` }}>
+          <div key={i} className="group bg-zinc-800/50 rounded-2xl p-6 border border-zinc-700 hover:border-blue-700 hover:shadow-sm transition-all duration-300 animate-fade-in-up" style={{ animationDelay: `${(i + 2) * 50}ms` }}>
             <div className="flex justify-between items-start mb-4">
               <div>
-                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 text-xs font-bold rounded-lg mb-2">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-900/30 text-blue-400 text-xs font-bold rounded-lg mb-2">
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
                   {res.filename || "Unknown Source"}
                 </span>
@@ -167,9 +166,9 @@ export default function SearchTab() {
                   {res.size && <span>{(res.size / 1024).toFixed(1)} KB</span>}
                 </div>
               </div>
-              <span className="text-[10px] font-mono font-bold text-zinc-400 bg-zinc-100 dark:bg-zinc-800 px-2 py-1 rounded-md border border-zinc-200 dark:border-zinc-700">Match: {(res.score * 100).toFixed(0)}%</span>
+              <span className="text-[10px] font-mono font-bold text-zinc-400 bg-zinc-800 px-2 py-1 rounded-md border border-zinc-700">Match: {(res.score * 100).toFixed(0)}%</span>
             </div>
-            <p className="text-sm text-zinc-600 dark:text-zinc-400 whitespace-pre-wrap leading-relaxed group-hover:text-zinc-800 dark:group-hover:text-zinc-300 transition-colors">
+            <p className="text-sm text-zinc-400 whitespace-pre-wrap leading-relaxed group-hover:text-zinc-300 transition-colors">
               "... {res.text} ..."
             </p>
           </div>

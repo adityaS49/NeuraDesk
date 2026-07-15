@@ -54,27 +54,20 @@ export default function AuthScreen({ onLogin }: AuthScreenProps) {
   };
 
   return (
-    <div className="relative flex items-center justify-center h-screen bg-zinc-50 dark:bg-[#050505] overflow-hidden">
-      {/* Animated Mesh Background */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-purple-400/20 dark:bg-purple-900/20 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-3xl opacity-70 animate-blob"></div>
-        <div className="absolute top-[-10%] right-[-10%] w-96 h-96 bg-blue-400/20 dark:bg-blue-900/20 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-3xl opacity-70 animate-blob animation-delay-2000"></div>
-        <div className="absolute bottom-[-20%] left-[20%] w-96 h-96 bg-pink-400/20 dark:bg-pink-900/20 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-3xl opacity-70 animate-blob animation-delay-4000"></div>
-      </div>
-
-      <div className="z-10 w-full max-w-md p-8 m-4 rounded-2xl glass-panel border border-white/10 shadow-2xl">
-        <h2 className="text-3xl font-bold mb-6 text-center bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent">
+    <div className="relative flex items-center justify-center h-screen bg-zinc-900 overflow-hidden">
+      <div className="z-10 w-full max-w-md p-8 m-4 rounded-2xl glass-panel shadow-lg">
+        <h2 className="text-3xl font-bold mb-6 text-center text-blue-400">
           NeuraDesk
         </h2>
-        <div className="flex gap-4 mb-6 p-1 bg-black/5 dark:bg-white/5 rounded-xl">
+        <div className="flex gap-4 mb-6 p-1 bg-white/5 rounded-xl">
           <button 
-            className={`flex-1 py-2 rounded-lg font-medium transition-all ${isLogin ? 'bg-white dark:bg-zinc-800 shadow-sm text-blue-600' : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'}`}
+            className={`flex-1 py-2 rounded-lg font-medium transition-all ${isLogin ? 'bg-zinc-800 shadow-sm text-blue-400' : 'text-zinc-500 hover:text-zinc-300'}`}
             onClick={() => setIsLogin(true)}
           >
             Login
           </button>
           <button 
-            className={`flex-1 py-2 rounded-lg font-medium transition-all ${!isLogin ? 'bg-white dark:bg-zinc-800 shadow-sm text-purple-600' : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'}`}
+            className={`flex-1 py-2 rounded-lg font-medium transition-all ${!isLogin ? 'bg-zinc-800 shadow-sm text-blue-400' : 'text-zinc-500 hover:text-zinc-300'}`}
             onClick={() => setIsLogin(false)}
           >
             Register
@@ -89,23 +82,23 @@ export default function AuthScreen({ onLogin }: AuthScreenProps) {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">Username</label>
+            <label className="block text-sm font-medium text-zinc-300 mb-1">Username</label>
             <input 
               type="text" 
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl bg-white/50 dark:bg-black/20 border border-zinc-200 dark:border-zinc-800 focus:outline-none focus:ring-2 focus:ring-blue-500 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400"
+              className="w-full px-4 py-3 rounded-xl bg-zinc-800 border border-zinc-700 focus:outline-none focus:ring-2 focus:ring-blue-500 text-zinc-100 placeholder-zinc-500 shadow-sm"
               placeholder="Enter your username"
               required
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">Password</label>
+            <label className="block text-sm font-medium text-zinc-300 mb-1">Password</label>
             <input 
               type="password" 
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl bg-white/50 dark:bg-black/20 border border-zinc-200 dark:border-zinc-800 focus:outline-none focus:ring-2 focus:ring-blue-500 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400"
+              className="w-full px-4 py-3 rounded-xl bg-zinc-800 border border-zinc-700 focus:outline-none focus:ring-2 focus:ring-blue-500 text-zinc-100 placeholder-zinc-500 shadow-sm"
               placeholder="Enter your password"
               required
             />
@@ -113,7 +106,7 @@ export default function AuthScreen({ onLogin }: AuthScreenProps) {
           <button 
             type="submit" 
             disabled={loading}
-            className="w-full py-3 rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-medium shadow-lg shadow-blue-500/25 transition-all active:scale-[0.98] disabled:opacity-70"
+            className="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium shadow-sm transition-all active:scale-[0.98] disabled:opacity-70"
           >
             {loading ? "Processing..." : isLogin ? "Sign In" : "Create Account"}
           </button>

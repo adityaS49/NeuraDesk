@@ -2,20 +2,13 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f8fafc;
-  --foreground: #0f172a;
+  --background: #18181b; /* zinc-900 */
+  --foreground: #f4f4f5; /* zinc-50 */
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #030712;
-    --foreground: #f8fafc;
-  }
 }
 
 body {
@@ -25,9 +18,9 @@ body {
   overflow-x: hidden;
 }
 
-/* Custom Utilities for Glassmorphism & Gradients */
+/* Custom Utilities for Glassmorphism */
 .glass-panel {
-  @apply bg-white/60 dark:bg-zinc-900/60 backdrop-blur-xl border border-white/40 dark:border-zinc-800/50 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)];
+  @apply bg-zinc-800/90 border border-zinc-700 shadow-sm;
 }
 
 /* Animations */
@@ -44,25 +37,6 @@ body {
 
 .animate-fade-in-up {
   animation: fade-in-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-@keyframes blob {
-  0% { transform: translate(0px, 0px) scale(1); }
-  33% { transform: translate(30px, -50px) scale(1.1); }
-  66% { transform: translate(-20px, 20px) scale(0.9); }
-  100% { transform: translate(0px, 0px) scale(1); }
-}
-
-.animate-blob {
-  animation: blob 10s infinite;
-}
-
-.animation-delay-2000 {
-  animation-delay: 2s;
-}
-
-.animation-delay-4000 {
-  animation-delay: 4s;
 }
 
 /* Hide Scrollbars completely but allow scrolling */

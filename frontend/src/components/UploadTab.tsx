@@ -64,19 +64,19 @@ export default function UploadTab() {
   return (
     <div className="w-full max-w-xl glass-panel rounded-3xl p-8 mt-12 animate-fade-in-up">
       <div className="text-center mb-8">
-        <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 to-purple-600">Upload Knowledge</h2>
-        <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-2">Feed your AI new documents to expand its context.</p>
+        <h2 className="text-2xl font-bold text-blue-400">Upload Knowledge</h2>
+        <p className="text-sm text-zinc-400 mt-2">Feed your AI new documents to expand its context.</p>
       </div>
 
       <form onSubmit={handleUploadSubmit} className="flex flex-col gap-6">
         
         <div className="flex flex-col gap-2">
-          <label className="text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">Document Type</label>
+          <label className="text-xs font-bold uppercase tracking-wider text-zinc-400">Document Type</label>
           <div className="relative">
             <select 
               value={docType}
               onChange={(e) => setDocType(e.target.value)}
-              className="w-full bg-zinc-100/50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 rounded-xl p-3.5 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 appearance-none outline-none transition-all cursor-pointer"
+              className="w-full bg-zinc-800 border border-zinc-700 text-zinc-100 rounded-xl p-3.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none outline-none transition-all cursor-pointer shadow-sm"
             >
               <option value="pdf">PDF Document</option>
               <option value="txt">Text File</option>
@@ -91,7 +91,7 @@ export default function UploadTab() {
         </div>
 
         <div className="flex flex-col gap-2">
-          <label className="text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">File</label>
+          <label className="text-xs font-bold uppercase tracking-wider text-zinc-400">File</label>
           
           <div 
             onDragOver={handleDragOver}
@@ -100,10 +100,10 @@ export default function UploadTab() {
             onClick={() => fileInputRef.current?.click()}
             className={`border-2 border-dashed rounded-2xl p-10 text-center cursor-pointer transition-all duration-300
               ${isDragging 
-                ? 'border-indigo-500 bg-indigo-50/50 dark:bg-indigo-900/20 scale-105' 
+                ? 'border-blue-500 bg-blue-900/20 scale-105' 
                 : file 
-                  ? 'border-green-400 bg-green-50/30 dark:bg-green-900/10'
-                  : 'border-zinc-300 dark:border-zinc-700 hover:border-indigo-400 hover:bg-zinc-50/50 dark:hover:bg-zinc-800/50'
+                  ? 'border-green-400 bg-green-900/20'
+                  : 'border-zinc-700 hover:border-blue-500 hover:bg-zinc-800'
               }
             `}
           >
@@ -116,13 +116,13 @@ export default function UploadTab() {
             {file ? (
               <div className="flex flex-col items-center gap-2">
                 <svg className="w-10 h-10 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                <span className="font-semibold text-zinc-800 dark:text-zinc-200">{file.name}</span>
-                <span className="text-xs text-zinc-500">{(file.size / 1024 / 1024).toFixed(2)} MB</span>
+                <span className="font-semibold text-zinc-200">{file.name}</span>
+                <span className="text-xs text-zinc-400">{(file.size / 1024 / 1024).toFixed(2)} MB</span>
               </div>
             ) : (
               <div className="flex flex-col items-center gap-2">
-                <svg className="w-10 h-10 text-zinc-400 dark:text-zinc-500 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
-                <span className="font-medium text-zinc-600 dark:text-zinc-300">Click to upload or drag and drop</span>
+                <svg className="w-10 h-10 text-zinc-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
+                <span className="font-medium text-zinc-300">Click to upload or drag and drop</span>
                 <span className="text-xs text-zinc-400">PDF, TXT, CSV, JSON (MAX. 10MB)</span>
               </div>
             )}
@@ -132,9 +132,8 @@ export default function UploadTab() {
         <button
           type="submit"
           disabled={!file || isUploading}
-          className="relative mt-2 w-full rounded-xl px-4 py-3.5 font-bold text-white transition-all overflow-hidden group disabled:opacity-50 disabled:cursor-not-allowed"
+          className="relative mt-2 w-full rounded-xl px-4 py-3.5 font-bold text-white transition-all overflow-hidden group disabled:opacity-50 disabled:cursor-not-allowed bg-blue-600 hover:bg-blue-700"
         >
-          <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 to-purple-600 group-hover:scale-105 transition-transform duration-300"></div>
           <span className="relative flex items-center justify-center gap-2">
             {isUploading ? (
               <>
@@ -148,7 +147,7 @@ export default function UploadTab() {
         </button>
 
         {uploadStatus && (
-          <div className={`mt-2 p-4 rounded-xl text-sm font-medium animate-fade-in-up flex items-center gap-2 ${uploadStatus.includes("Success") ? "bg-green-100/50 text-green-700 dark:bg-green-900/20 dark:text-green-400 border border-green-200 dark:border-green-800/30" : "bg-zinc-100 text-zinc-600 dark:bg-zinc-800/50 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700"}`}>
+          <div className={`mt-2 p-4 rounded-xl text-sm font-medium animate-fade-in-up flex items-center gap-2 ${uploadStatus.includes("Success") ? "bg-green-900/20 text-green-400 border border-green-800/30" : "bg-zinc-800/50 text-zinc-300 border border-zinc-700"}`}>
             {uploadStatus.includes("Success") && <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>}
             {uploadStatus}
           </div>
