@@ -37,7 +37,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-rag_search = RAGSearch()
+rag_search_instance = None
+
+def get_rag_search():
+    global rag_search_instance
+    if rag_search_instance is None:
+        print("[INFO] Initializing RAGSearch (downloading models if first run)...")
+        rag_search_instance = RAGSearch()
+    return rag_search_instance
 
 def get_db_connection():
     db_url = os.getenv("DATABASE_URL", "postgresql://python_rag_user:rag_password@127.0.0.1:5435/rag_memory")
@@ -71,17 +78,7 @@ def startup_event():
         conn.commit()
         cursor.close()
         conn.close()
-        
-        # Ensure collection exists without deleting it
-        try:
-            rag_search.vectorstore.client.get_collection(rag_search.vectorstore.collection_name)
-        except Exception:
-            from qdrant_client.http import models as qmodels
-            rag_search.vectorstore.client.create_collection(
-                collection_name=rag_search.vectorstore.collection_name,
-                vectors_config=qmodels.VectorParams(size=rag_search.vectorstore.dim, distance=qmodels.Distance.COSINE)
-            )
-        print("[INFO] Verified Postgres tables and Qdrant collection for multi-tenancy.")
+        print("[INFO] Verified Postgres tables for multi-tenancy.")
     except Exception as e:
         print(f"[ERROR] Failed to initialize DB schemas: {e}")
 
@@ -193,7 +190,7 @@ class ChatResponse(BaseModel):
 
 @app.post("/api/chat", response_model=ChatResponse)
 async def chat(request: ChatRequest, current_user: dict = Depends(get_current_user)):
-    answer = rag_search.search_and_summarize(
+    answer = get_rag_search().search_and_summarize(
         request.query, 
         session_id=request.session_id, 
         top_k=3,
@@ -221,7 +218,7 @@ async def upload_document(background_tasks: BackgroundTasks, file: UploadFile = 
         documents = load_single_document(temp_file_path, file.filename)
         
         if documents:
-            rag_search.vectorstore.add_documents(documents, file.filename, user_id)
+            get_rag_search().vectorstore.add_documents(documents, file.filename, user_id)
             
         conn = get_db_connection()
         cursor = conn.cursor()
@@ -282,7 +279,7 @@ async def delete_document(filename: str, current_user: dict = Depends(get_curren
         print(f"[ERROR] DB Delete failed: {e}")
         raise HTTPException(status_code=500, detail="Failed to delete from database")
 
-    rag_search.vectorstore.delete_by_source(filename, user_id)
+    get_rag_search().vectorstore.delete_by_source(filename, user_id)
         
     return {"message": f"Successfully deleted {filename}"}
 
@@ -294,7 +291,7 @@ class SearchRequest(BaseModel):
 @app.post("/api/search")
 async def unified_search(request: SearchRequest, current_user: dict = Depends(get_current_user)):
     user_id = str(current_user["id"])
-    vector_results = rag_search.vectorstore.query(
+    vector_results = get_rag_search().vectorstore.query(
         request.query, 
         top_k=request.top_k, 
         filter_source=request.filename_filter,
@@ -344,7 +341,7 @@ async def unified_search(request: SearchRequest, current_user: dict = Depends(ge
         config = {"configurable": {"thread_id": f"search_tab_{user_id}_{uuid.uuid4()}"}}
         input_message = HumanMessage(content=request.query)
         # Assuming search.py is modified to pass username to the graph state if supported, or we just rely on rag_search logic
-        state = rag_search.graph.invoke({"messages": [input_message], "context": context, "username": current_user["username"]}, config)
+        state = get_rag_search().graph.invoke({"messages": [input_message], "context": context, "username": current_user["username"]}, config)
         answer = state["messages"][-1].content
     except Exception as e:
         print(f"[ERROR] LLM synthesis failed in search: {e}")
