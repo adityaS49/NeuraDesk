@@ -354,8 +354,7 @@ python-dotenv==1.2.2
     #   uvicorn
 python-multipart==0.0.32
     # via python-rag (pyproject.toml)
-pywin32==312
-    # via portalocker
+
 pyyaml==6.0.3
     # via
     #   chromadb
@@ -489,8 +488,6 @@ websockets==15.0.1
     #   langgraph-sdk
     #   langsmith
     #   uvicorn
-win32-setctime==1.2.0
-    # via loguru
 xlrd==2.0.2
     # via python-rag (pyproject.toml)
 xxhash==3.8.1
