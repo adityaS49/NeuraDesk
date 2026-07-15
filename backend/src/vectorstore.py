@@ -31,6 +31,21 @@ class QdrantVectorStore:
                 collection_name=self.collection_name,
                 vectors_config=qmodels.VectorParams(size=self.dim, distance=qmodels.Distance.COSINE),
             )
+            
+        # Ensure payload indexes exist for filtering
+        try:
+            self.client.create_payload_index(
+                collection_name=self.collection_name,
+                field_name="user_id",
+                field_schema=qmodels.PayloadSchemaType.KEYWORD
+            )
+            self.client.create_payload_index(
+                collection_name=self.collection_name,
+                field_name="source",
+                field_schema=qmodels.PayloadSchemaType.KEYWORD
+            )
+        except Exception:
+            pass
         print(f"[INFO] Loaded Qdrant collection '{collection_name}' with embedding model: {embedding_model}")
 
     def add_documents(self, documents: List[Any], source_filename: str, user_id: str):
