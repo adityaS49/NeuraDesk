@@ -39,7 +39,7 @@ class RAGSearch:
         self.pool = ConnectionPool(
             conninfo=self.db_url,
             max_size=20,
-            kwargs={"autocommit": True}
+            kwargs={"autocommit": True, "prepare_threshold": None}
         )
         
         # Setup Checkpointer
