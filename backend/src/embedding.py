@@ -1,14 +1,14 @@
 from typing import List, Any
 from langchain_text_splitters  import RecursiveCharacterTextSplitter
-from sentence_transformers import SentenceTransformer
+from fastembed import TextEmbedding
 import numpy as np
 from .data_loader import load_all_documents
 
 class EmbeddingPipeline:
-    def __init__(self, model_name: str = "all-MiniLM-L6-v2", chunk_size: int = 1000, chunk_overlap: int = 200):
+    def __init__(self, model_name: str = "sentence-transformers/all-MiniLM-L6-v2", chunk_size: int = 1000, chunk_overlap: int = 200):
         self.chunk_size = chunk_size
         self.chunk_overlap = chunk_overlap
-        self.model = SentenceTransformer(model_name)
+        self.model = TextEmbedding(model_name=model_name)
         print(f"[INFO] Loaded embedding model: {model_name}")
 
     def chunk_documents(self, documents: List[Any]) -> List[Any]:
@@ -25,7 +25,8 @@ class EmbeddingPipeline:
     def embed_chunks(self, chunks: List[Any]) -> np.ndarray:
         texts = [chunk.page_content for chunk in chunks]
         print(f"[INFO] Generating embeddings for {len(texts)} chunks...")
-        embeddings = self.model.encode(texts, show_progress_bar=True)
-        print(f"[INFO] Embeddings shape: {embeddings.shape}")
-        return embeddings
+        embeddings = list(self.model.embed(texts))
+        emb_array = np.vstack(embeddings)
+        print(f"[INFO] Embeddings shape: {emb_array.shape}")
+        return emb_array
 

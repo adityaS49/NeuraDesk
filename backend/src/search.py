@@ -20,7 +20,7 @@ class State(TypedDict):
     username: str
 
 class RAGSearch:
-    def __init__(self, collection_name: str = "documents", embedding_model: str = "all-MiniLM-L6-v2", llm_model: str = "llama-3.3-70b-versatile"):
+    def __init__(self, collection_name: str = "documents", embedding_model: str = "sentence-transformers/all-MiniLM-L6-v2", llm_model: str = "llama-3.3-70b-versatile"):
         self.vectorstore = QdrantVectorStore(collection_name, embedding_model)
         
         # We rely on the unified search ingestion API to add documents incrementally

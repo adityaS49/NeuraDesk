@@ -2,25 +2,26 @@ import os
 import numpy as np
 import uuid
 from typing import List, Any
-from sentence_transformers import SentenceTransformer
+from fastembed import TextEmbedding
 from qdrant_client import QdrantClient
 from qdrant_client.http import models as qmodels
 from .embedding import EmbeddingPipeline
 from .data_loader import load_all_documents
 
 class QdrantVectorStore:
-    def __init__(self, collection_name: str = "documents", embedding_model: str = "all-MiniLM-L6-v2", chunk_size: int = 1000, chunk_overlap: int = 200):
+    def __init__(self, collection_name: str = "documents", embedding_model: str = "sentence-transformers/all-MiniLM-L6-v2", chunk_size: int = 1000, chunk_overlap: int = 200):
         qdrant_url = os.getenv("QDRANT_URL", "http://localhost:6333")
         qdrant_api_key = os.getenv("QDRANT_API_KEY", None)
         self.client = QdrantClient(url=qdrant_url, api_key=qdrant_api_key)
         self.collection_name = collection_name
         self.embedding_model = embedding_model
-        self.model = SentenceTransformer(embedding_model)
+        self.model = TextEmbedding(model_name=embedding_model)
         self.chunk_size = chunk_size
         self.chunk_overlap = chunk_overlap
         
         # We assume embedding model produces 384 dimensions for all-MiniLM-L6-v2
-        self.dim = self.model.get_sentence_embedding_dimension()
+        dummy_emb = list(self.model.embed(["dummy"]))[0]
+        self.dim = len(dummy_emb)
         
         # Ensure collection exists
         try:
@@ -93,7 +94,7 @@ class QdrantVectorStore:
 
     def query(self, query_text: str, user_id: str, top_k: int = 5, filter_source: str = None):
         print(f"[INFO] Querying vector store for: '{query_text}'" + (f" (filtered by {filter_source})" if filter_source else ""))
-        query_emb = self.model.encode([query_text])[0]
+        query_emb = list(self.model.embed([query_text]))[0]
         
         vector_results = self.search(query_emb, user_id=user_id, top_k=top_k, filter_source=filter_source)
         
