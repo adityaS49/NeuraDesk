@@ -12,8 +12,8 @@ load_dotenv(os.path.join(BASE_DIR, ".env.local"), override=True)
 class Settings:
     PROJECT_NAME: str = "Python-RAG"
     DATABASE_URL: str = os.getenv("DATABASE_URL")
-    JWT_SECRET: str = os.getenv("JWT_SECRET")
-    JWT_ALGORITHM: str = os.getenv("JWT_ALGORITHM")
+    JWT_SECRET: str = os.getenv("JWT_SECRET", "super-secret-key-change-in-production")
+    JWT_ALGORITHM: str = os.getenv("JWT_ALGORITHM", "HS256")
     
     _expire = os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES")
     ACCESS_TOKEN_EXPIRE_MINUTES: int = int(_expire) if _expire else 10080
