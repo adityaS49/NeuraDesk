@@ -6,9 +6,9 @@ services:
     image: postgres:15-alpine
     container_name: python-rag-postgres
     env_file:
-      - ./backend/.env
+      - ./backend/.env.local
     ports:
-      - "5435:5432"
+      - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     restart: unless-stopped
@@ -38,8 +38,7 @@ services:
     image: qdrant/qdrant:latest
     container_name: python-rag-qdrant
     ports:
-      - "6333:6333" # REST API
-      - "6334:6334"           # gRPC
+      - "6333:6333"
     volumes:
       - qdrant_data:/qdrant/storage
     restart: unless-stopped
