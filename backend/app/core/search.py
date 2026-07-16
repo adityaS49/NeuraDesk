@@ -26,14 +26,15 @@ class RAGSearch:
         # We rely on the unified search ingestion API to add documents incrementally
         # No initial directory loading is performed.
             
-        groq_api_key = os.getenv("GROQ_API_KEY")
+        from app.core.config import settings
+        groq_api_key = settings.GROQ_API_KEY
         if not groq_api_key or groq_api_key.strip() == "" or groq_api_key == "your_groq_api_key_here":
             raise ValueError(
                 "\n[ERROR] GROQ_API_KEY is not configured. Please set your actual Groq API key in the '.env' file in the project root."
             )
         self.llm = ChatGroq(groq_api_key=groq_api_key, model_name=llm_model)
         
-        self.db_url = os.getenv("DATABASE_URL", "postgresql://python_rag_user:rag_password@127.0.0.1:5435/rag_memory")
+        self.db_url = settings.DATABASE_URL or "postgresql://python_rag_user:rag_password@127.0.0.1:5435/rag_memory"
         
         # PostgresSaver needs a connection pool (synchronous for PostgresSaver)
         self.pool = ConnectionPool(

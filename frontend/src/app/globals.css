@@ -2,8 +2,12 @@
 @import "tailwindcss";
 
 :root {
-  --background: #18181b; /* zinc-900 */
-  --foreground: #f4f4f5; /* zinc-50 */
+  --background: #0f172a; /* slate-900 */
+  --foreground: #f8fafc; /* slate-50 */
+  --primary: #4f46e5; /* indigo-600 */
+  --primary-hover: #4338ca; /* indigo-700 */
+  --panel-bg: rgba(30, 41, 59, 0.7); /* slate-800 with opacity */
+  --panel-border: rgba(51, 65, 85, 0.5); /* slate-700 with opacity */
 }
 
 @theme inline {
@@ -16,11 +20,27 @@ body {
   color: var(--foreground);
   font-family: 'Outfit', sans-serif;
   overflow-x: hidden;
+  background-image: 
+    radial-gradient(circle at 15% 50%, rgba(79, 70, 229, 0.1), transparent 25%),
+    radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.1), transparent 25%);
+  background-attachment: fixed;
 }
 
 /* Custom Utilities for Glassmorphism */
 .glass-panel {
-  @apply bg-zinc-800/90 border border-zinc-700 shadow-sm;
+  background-color: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.glass-modal {
+  background-color: rgba(15, 23, 42, 0.85); /* slate-900 */
+  border: 1px solid rgba(51, 65, 85, 0.8);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
 }
 
 /* Animations */

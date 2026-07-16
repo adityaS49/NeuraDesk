@@ -10,8 +10,9 @@ from .data_loader import load_all_documents
 
 class QdrantVectorStore:
     def __init__(self, collection_name: str = "documents", embedding_model: str = "sentence-transformers/all-MiniLM-L6-v2", chunk_size: int = 1000, chunk_overlap: int = 200):
-        qdrant_url = os.getenv("QDRANT_URL", "http://localhost:6333")
-        qdrant_api_key = os.getenv("QDRANT_API_KEY", None)
+        from app.core.config import settings
+        qdrant_url = settings.QDRANT_URL or "http://localhost:6333"
+        qdrant_api_key = settings.QDRANT_API_KEY
         self.client = QdrantClient(url=qdrant_url, api_key=qdrant_api_key)
         self.collection_name = collection_name
         self.embedding_model = embedding_model
