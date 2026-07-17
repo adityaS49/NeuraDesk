@@ -66,7 +66,7 @@ export default function Home() {
   const handleDeleteDoc = async (filename: string) => {
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch(`${API_BASE}/api/documents/${filename}`, {
+      const res = await fetch(`${API_BASE}/api/documents/${encodeURIComponent(filename)}`, {
         method: "DELETE",
         headers: { "Authorization": `Bearer ${token}` }
       });

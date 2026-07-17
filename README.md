@@ -11,9 +11,10 @@ Built with a **Next.js** frontend and a **FastAPI** backend, the system utilizes
 - **Dynamic Premium UI**: A highly engaging, glassmorphic Next.js interface with micro-animations.
 - **Diskless Ingestion**: Uploaded documents are parsed entirely in memory/temp-space and never saved to disk.
 - **Multi-Format Support**: Ingests PDF (via PyMuPDF for robust extraction), Text, CSV, Excel (with safe file lock handling), Word, and JSON files seamlessly.
+- **Web Scraping Chrome Extension**: Easily upload and index any webpage directly from your browser. The backend utilizes LangChain's WebBaseLoader and a Celery worker to asynchronously index the web content.
 - **Agentic RAG Engine**: Utilizes LangGraph to power an advanced conversational and search pipeline, ensuring accurate answers with context citations.
 - **Secure Multi-Tenancy**: Persistent Postgres storage and session-based authentication prevents data cross-contamination between different users.
-- **Hybrid Search & Management**: You can query the entire knowledge base, or filter by specific uploaded documents.
+- **Hybrid Search & Management**: You can query the entire knowledge base, or filter by specific uploaded documents (or URLs).
 - **Local Embeddings & High-Speed LLMs**: Generates semantic embeddings locally using `sentence-transformers` and queries via the lightning-fast Groq API (`llama-3.3-70b-versatile`).
 
 ---
@@ -27,33 +28,48 @@ Built with a **Next.js** frontend and a **FastAPI** backend, the system utilizes
 
 ### Backend
 - **Framework**: FastAPI (Python 3.10+)
+- **Background Tasks**: Celery & Redis
 - **AI/LLM**: LangChain, LangGraph, Groq API
 - **Embeddings**: `sentence-transformers` (`all-MiniLM-L6-v2`)
 - **Metadata Database**: PostgreSQL (via `asyncpg`)
 - **Vector Database**: Qdrant (Dockerized)
+- **Task Queue Broker**: Redis (Dockerized)
+
+### Browser Extension
+- **Platform**: Google Chrome (Manifest V3)
+- **Technologies**: Vanilla HTML/CSS/JavaScript
 
 ---
 
 ## ⚙️ Quickstart Setup
 
 ### 1. Prerequisites
-- Docker & Docker Compose (for PostgreSQL and Qdrant)
+- Docker & Docker Compose (for PostgreSQL, Redis, and Qdrant)
 - Node.js (for Next.js frontend)
 - Python 3.10+ and `uv` package manager (for FastAPI backend)
 
 ### 2. Infrastructure Setup
-Start the local databases (Postgres and Qdrant) using Docker Compose:
+Start the local databases (Postgres, Redis, and Qdrant) using Docker Compose:
 ```bash
 docker-compose up -d
 ```
 
 ### 3. Backend Setup
 1. Navigate to the `backend` directory.
-2. Create a `.env` file based on `.env.example` (ensure `GROQ_API_KEY`, Postgres, and Qdrant variables are set).
-3. Install dependencies and run the server:
+2. Create a `.env` file based on `.env.example` (ensure `GROQ_API_KEY`, Postgres, Redis, and Qdrant variables are set).
+3. Install dependencies:
 ```bash
 cd backend
-uv run python -m uvicorn api:app --reload
+uv pip install -r requirements.txt
+```
+4. Run the FastAPI server in one terminal:
+```bash
+uv run python -m uvicorn app.main:app --reload
+```
+5. Run the Celery worker in a second terminal (essential for processing background uploads and URL scraping):
+```bash
+# On Windows, use --pool=solo. On Linux/Mac, you can omit the pool flag.
+uv run celery -A app.core.celery_app worker --pool=solo --loglevel=info
 ```
 *The backend will be available at http://127.0.0.1:8000*
 
@@ -69,6 +85,12 @@ npm install
 npm run dev
 ```
 *The UI will be available at http://localhost:3000*
+
+### 5. Chrome Extension Setup
+1. Open Google Chrome and navigate to `chrome://extensions/`.
+2. Enable **Developer mode** (top right corner).
+3. Click **Load unpacked** and select the `chrome-extension` directory in this repository.
+4. Open the extension, enter your NeuraDesk login details, and seamlessly scrape and query web pages!
 
 ---
 

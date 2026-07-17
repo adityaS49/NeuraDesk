@@ -7,7 +7,8 @@ from psycopg2.extras import RealDictCursor
 
 from app.api.dependencies import get_current_user, get_rag_search
 from app.db.database import get_db_connection
-from app.tasks.document_tasks import process_document_task
+from app.tasks.document_tasks import process_document_task, process_url_task
+from app.models.schemas import UrlUploadRequest
 
 router = APIRouter()
 
@@ -30,6 +31,16 @@ async def upload_document(background_tasks: BackgroundTasks, file: UploadFile = 
     
     return {"message": f"Successfully queued {file.filename} for processing", "filename": file.filename}
 
+@router.post("/upload-url")
+async def upload_url(request: UrlUploadRequest, background_tasks: BackgroundTasks, current_user: dict = Depends(get_current_user)):
+    user_id = str(current_user["id"])
+    url = request.url
+    
+    # Dispatch Celery background task
+    process_url_task.delay(url, user_id)
+    
+    return {"message": f"Successfully queued {url} for processing", "filename": url}
+
 @router.get("/documents")
 async def list_documents(current_user: dict = Depends(get_current_user)):
     try:
@@ -48,7 +59,7 @@ async def list_documents(current_user: dict = Depends(get_current_user)):
         print(f"[ERROR] DB Select failed: {e}")
         return {"documents": []}
 
-@router.delete("/documents/{filename}")
+@router.delete("/documents/{filename:path}")
 async def delete_document(filename: str, current_user: dict = Depends(get_current_user)):
     user_id = str(current_user["id"])
     try:

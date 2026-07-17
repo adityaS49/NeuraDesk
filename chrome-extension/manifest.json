@@ -1,0 +1,17 @@
+{
+  "manifest_version": 3,
+  "name": "Python-RAG Web Scraper",
+  "version": "1.0",
+  "description": "Scrape web pages and chat with their content using Python-RAG.",
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "storage"
+  ],
+  "host_permissions": [
+    "http://localhost:8000/*"
+  ]
+}

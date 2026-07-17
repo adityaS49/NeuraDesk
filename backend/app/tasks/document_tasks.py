@@ -4,6 +4,7 @@ from app.core.celery_app import celery_app
 from app.core.data_loader import load_single_document
 from app.db.database import get_db_connection
 from app.core.search import RAGSearch
+from langchain_community.document_loaders import WebBaseLoader
 
 @celery_app.task(bind=True)
 def process_document_task(self, temp_file_path: str, filename: str, user_id: str, file_size: int):
@@ -45,3 +46,46 @@ def process_document_task(self, temp_file_path: str, filename: str, user_id: str
             os.remove(temp_file_path)
             
     return {"message": "success", "filename": filename}
+
+@celery_app.task(bind=True)
+def process_url_task(self, url: str, user_id: str):
+    try:
+        print(f"[CELERY] Starting to process URL: {url} for user: {user_id}")
+        
+        # Load and parse the URL
+        loader = WebBaseLoader(url)
+        documents = loader.load()
+        
+        if documents:
+            # Add source metadata just in case
+            for doc in documents:
+                doc.metadata["source"] = url
+                
+            rag = RAGSearch()
+            rag.vectorstore.add_documents(documents, url, user_id)
+            
+        # Update PostgreSQL
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        doc_id = str(uuid.uuid4())
+        # Estimate size as length of content
+        file_size = sum(len(doc.page_content) for doc in documents) if documents else 0
+        
+        cursor.execute(
+            """
+            INSERT INTO documents (id, user_id, filename, file_path, size) 
+            VALUES (%s, %s, %s, %s, %s) 
+            ON CONFLICT (user_id, filename) DO UPDATE SET size = EXCLUDED.size, uploaded_at = CURRENT_TIMESTAMP
+            """,
+            (doc_id, user_id, url, "url", file_size)
+        )
+        conn.commit()
+        cursor.close()
+        conn.close()
+        
+        print(f"[CELERY] Successfully processed and indexed URL: {url}")
+        
+    except Exception as e:
+        print(f"[CELERY ERROR] URL processing failed for {url}: {e}")
+        
+    return {"message": "success", "filename": url}

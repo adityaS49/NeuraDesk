@@ -5,6 +5,9 @@ class UserCreate(BaseModel):
     username: str
     password: str
 
+class UrlUploadRequest(BaseModel):
+    url: str
+
 class ChatRequest(BaseModel):
     query: str
     session_id: str = "default"
